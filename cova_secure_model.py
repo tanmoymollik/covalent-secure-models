@@ -1,12 +1,15 @@
 from cova_secure_io_helpers import fetch_data_s3, persist_model
-from cova_secure_model_helpers import extract_model_params
+from cova_secure_model_helpers import *
 
 class CovaSecureModel(object):
-    """docstring for CovaSecureModel"""
-    def __init__(self, data_hash, X_feats, Y_feats=None, 
+    """CovaSecureModel is a custom model wrapper for running private user model on 
+    sensitive data in covalent secure servers (CS2) or CovaClave (C2)"""
+
+    def __init__(self, data_hash, X_feats, Y_feats=[], 
         process_data_fn=lambda df: df,
         model_name='ols', model_params={}):
         super(CovaSecureModel, self).__init__()
+
         self.data_hash = data_hash
         self.X_feats = X_feats
         self.Y_feats = Y_feats
@@ -22,9 +25,11 @@ class CovaSecureModel(object):
         self.df = process_data_fn(self.df)
         
         self.XX = self.df[self.X_feats]
-        self.YY = 
+        self.YY = self.df[self.Y_feats]
 
     def check_information_amount(self):
+        # TODO: measure Shannon's entropy in filtered data
+        pass
 
     def train_model(self):
         if self.model_type == 'supervised':
@@ -38,17 +43,26 @@ class CovaSecureModel(object):
 
     def get_model_params(self):
         # get the params we need to reconstruct models offline
-        self.model_params = 
+        self.model_params = extract_model_params(self.model, self.model_name)
 
-    def extract_model_params(self):
+    def check_information_ratio(self):
+        # TODO: check the information ratio of input data and output params
+        pass
+
+    def secure_store_model_params(self):
         persist_model(self.model_params, self.model_scores)
 
-
     def run(self):
-        self.fetch_data_local()
+        self.fetch_data_s3()
         self.process_data()
+        self.check_information_amount()
         self.train_model()
+        self.compute_model_scores()
+        self.get_model_params()
+        self.check_information_ratio()
+        self.secure_store_model_params()
 
 
 if __name__ == '__main__':
-    main()
+    # TODO: argparse args
+    cova_secure_model = CovaSecureModel()
