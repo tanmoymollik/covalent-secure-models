@@ -1,2 +1,2 @@
 # covalent-secure-models
-This repo will have the model wrappers for securing models run in covalent secure servers (CS2) or CovaClave (C2)
+Custom model wrapper for running private user model on sensitive data in covalent secure servers (CS2) or CovaClave (C2)
