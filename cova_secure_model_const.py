@@ -1,5 +1,6 @@
 MODEL_IMPORT_MAPS = {
-    'ols' : 'linear_model',
+    'ols' : {"import_name": 'linear_model', "model_name": '.LinearRegression', 
+        "supervised": 1, "regression": 1},
     'ridge': 'linear_model',
     'lasso': 'linear_model',
     'elastic_net': 'linear_model',
