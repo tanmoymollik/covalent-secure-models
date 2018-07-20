@@ -11,7 +11,7 @@ def get_model_from_params(model_name, model_params):
 
     try:
         s = MODEL_IMPORT_MAPS.get(model_name)
-        exec('from sklearn import ' + s +' as model')
+        exec('from sklearn import ' + s)
     except Exception as e:
         raise e
     s += MODEL_IMOORT_MAPS2.get(model_name)
