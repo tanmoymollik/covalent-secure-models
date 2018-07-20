@@ -4,7 +4,7 @@ def get_secure_params(model_params):
     # check if the model params are secure to pass
     # consult the documentations
 
-    return {}
+    return model_params
 
 def get_model_from_params(model_name, model_params):
     secure_params = get_secure_params(model_params)
@@ -14,13 +14,9 @@ def get_model_from_params(model_name, model_params):
         exec('from sklearn import ' + s +' as model')
     except Exception as e:
         raise e
-    
-    if model_name == 'ols':
-        return model.LinearRegression(**secure_params)
-    elif model_name = 'ridge':
-        return model.Ridge(**secure_params)
-    elif model_name == 'svm':
-        return model.SVC(**secure_params)
+	s += MODEL_IMOORT_MAPS2.get(model_name)
+	s += '(**secure_params)'
+	return eval(s)
     # and so on
 
 def extract_model_params(model, model_name):
