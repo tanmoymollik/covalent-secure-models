@@ -11,12 +11,13 @@ def get_model_from_params(model_name, model_params):
 
     try:
         s = MODEL_IMPORT_MAPS.get(model_name)
-        exec('from sklearn import ' + s)
+        exec('from sklearn import ' + s['import_name'])
     except Exception as e:
         raise e
-    s += MODEL_IMOORT_MAPS2.get(model_name)
-    s += '(**secure_params)'
-    return eval(s)
+	cmd = s['import_name']
+    cmd += s['model_name']
+    cmd += '(**secure_params)'
+    return eval(cmd)
     # and so on
 
 def extract_model_params(model, model_name):
