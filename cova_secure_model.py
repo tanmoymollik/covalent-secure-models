@@ -1,6 +1,5 @@
 from cova_secure_io_helpers import fetch_data_s3, persist_model
 from cova_secure_model_helpers import *
-from sklearn.externals import joblib
 
 class CovaSecureModel(object):
     """CovaSecureModel is a custom model wrapper for running private user model on 
@@ -40,14 +39,7 @@ class CovaSecureModel(object):
 
     def compute_model_scores(self):
         # compute various model goodness score such as mean absolute error and so on 
-        self.model_scores = {'mae': 0.1}
-
-    def get_model_params(self):
-        # create a pkl file according to model name and dump it using joblib
-        file_name = self.model_name + ".pkl"
-        joblib.dump(self.model,file_name)
-        # get the params we need to reconstruct models offline
-        self.model_params = extract_model_params(self.model, self.model_name)
+        self.model_scores = {'mae': self.model.score}
 
     def check_information_ratio(self):
         # TODO: check the information ratio of input data and output params
