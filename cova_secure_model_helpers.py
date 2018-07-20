@@ -14,7 +14,7 @@ def get_model_from_params(model_name, model_params):
         exec('from sklearn import ' + s['import_name'])
     except Exception as e:
         raise e
-	cmd = s['import_name']
+    cmd = s['import_name']
     cmd += s['model_name']
     cmd += '(**secure_params)'
     return eval(cmd)
