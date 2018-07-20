@@ -43,6 +43,7 @@ class CovaSecureModel(object):
         self.model_scores = {'mae': 0.1}
 
     def get_model_params(self):
+        # create a pkl file according to model name and dump it using joblib
         file_name = self.model_name + ".pkl"
         joblib.dump(self.model,file_name)
         # get the params we need to reconstruct models offline
