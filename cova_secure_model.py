@@ -15,9 +15,7 @@ class CovaSecureModel(object):
         self.X_feats = X_feats
         self.Y_feats = Y_feats
         self.process_data_fn = process_data_fn
-        self.model = get_model_from_params(model_name, model_params)
 
-    
     def fetch_data_s3(self):
         # fetch data from local shared docker volume
         self.df = get_data_s3(self.data_hash)
@@ -32,6 +30,9 @@ class CovaSecureModel(object):
         # TODO: measure Shannon's entropy in filtered data
         pass
 
+    def prepare_model(self):
+        self.model = get_model_from_params(model_name, model_params)
+
     def train_model(self):
         if self.model_type == 'supervised':
             self.model.fit(self.XX, self.YY)
@@ -40,7 +41,7 @@ class CovaSecureModel(object):
 
     def compute_model_scores(self):
         # compute various model goodness score such as mean absolute error and so on 
-        self.model_scores = {'mae': 0.1}
+        self.model_scores = {'mae': self.model.score}
 
     def get_model_params(self):
         # create a pkl file according to model name and dump it using joblib
@@ -60,6 +61,7 @@ class CovaSecureModel(object):
         self.fetch_data_s3()
         self.process_data()
         self.check_information_amount()
+        self.prepare_model()
         self.train_model()
         self.compute_model_scores()
         self.get_model_params()
