@@ -1,5 +1,7 @@
 from cova_secure_io_helpers import fetch_data_s3, persist_model
 from cova_secure_model_helpers import *
+from cova_secure_model_const import MODEL_IMPORT_MAPS as ModelMap
+from sklearn.metrics import mean_absolute_error 
 
 class CovaSecureModel(object):
     """CovaSecureModel is a custom model wrapper for running private user model on 
@@ -40,24 +42,42 @@ class CovaSecureModel(object):
 
     def compute_model_scores(self):
         # compute various model goodness score such as mean absolute error and so on 
-        self.model_scores = {'mae': self.model.score}
-<<<<<<< HEAD
-=======
+        scores = 0.0
 
-    def get_model_params(self):
-        # create a pkl file according to model name and dump it using joblib
-        file_name = self.model_name + ".pkl"
-        joblib.dump(self.model,file_name)
-        # get the params we need to reconstruct models offline
-        self.model_params = extract_model_params(self.model, self.model_name)
->>>>>>> 31fc26f70ef34e935eae9cd9bba6fcd3d680d7c5
+        if ModelMap[self.model]["supervised"] == 1:
+            if ModelMap[self.model]["regression"] == 1:
+                # computing scores for regression model
+
+                y_predict = self.model.predict(self.X_feats)
+                scores = mean_absolute_error(self.Y_feats,y_predict,multioutput='uniform_average')
+
+            else:
+                # computing scores for classification models
+
+                y_predict = self.model.predict(self.X_feats)
+                length = len(y_predict)
+                total_correct = 0 
+
+                for i in range(length):
+                    if y_predict[i] == self.Y_feats[i] :
+                        total_correct += 1
+                
+                if length != 0 :
+                    scores = total_correct/length
+        
+        else:
+            # computing scores for clustering
+
+            scores = None
+
+        self.model_scores = {'mae': scores}
 
     def check_information_ratio(self):
         # TODO: check the information ratio of input data and output params
         pass
 
     def secure_store_model_params(self):
-        persist_model(self.model_params, self.model_scores)
+        persist_model(self.model, self.model_scores)
 
     def run(self):
         self.fetch_data_s3()
@@ -66,7 +86,6 @@ class CovaSecureModel(object):
         self.prepare_model()
         self.train_model()
         self.compute_model_scores()
-        self.get_model_params()
         self.check_information_ratio()
         self.secure_store_model_params()
 
